@@ -115,7 +115,7 @@ require('dotenv').config(); // đảm bảo có dòng này ở đầu file (nế
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,       // lấy từ biến môi trường
     clientSecret: process.env.GOOGLE_CLIENT_SECRET, // lấy từ biến môi trường
-    callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/auth/google/callback"
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://truck24-14.onrender.com/auth/google/callback"
 },
     async (accessToken, refreshToken, profile, done) => {
         try {
