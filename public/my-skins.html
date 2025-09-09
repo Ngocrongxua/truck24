@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trạng thái Skin của tôi</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f4f4f4; }
+    .rejected { color: red; font-weight: bold; }
+    .approved { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <hr>
+
+  <h2>Danh sách Skin của tôi</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Tên Skin</th>
+        <th>Ngày đăng</th>
+        <th>Trạng thái</th>
+        <th>Lý do từ chối</th>
+      </tr>
+    </thead>
+    <tbody id="skins-table-body">
+      <!-- Dữ liệu skin sẽ được thêm vào đây -->
+    </tbody>
+  </table>
+
+  <script>
+    // Gọi API để lấy danh sách skin của người dùng
+    function getMySkins() {
+      fetch('/api/my-skins')
+        .then(response => {
+          if (!response.ok) {
+            // Kiểm tra nếu API trả về lỗi
+            throw new Error('Không thể tải danh sách skin. Vui lòng thử lại sau.');
+          }
+          return response.json();
+        })
+        .then(skins => {
+          const tbody = document.getElementById('skins-table-body');
+          tbody.innerHTML = ''; // Xóa danh sách cũ
+
+          if (skins.length === 0) {
+            // Nếu không có skin nào, hiển thị thông báo
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="4">Không có skin nào được tải lên.</td>';
+            tbody.appendChild(tr);
+          } else {
+            skins.forEach(skin => {
+              const tr = document.createElement('tr');
+              let statusText = '';
+              let rejectionReason = '';
+
+              // Xử lý trạng thái skin
+              if (skin.rejected) {
+                statusText = `<span class="rejected">Đã bị từ chối ❌</span>`;
+                rejectionReason = skin.rejectionReason || 'Không có lý do cụ thể';
+              } else if (skin.approved) {
+                statusText = `<span class="approved">Đã phê duyệt ✅</span>`;
+                rejectionReason = '-';
+              } else {
+                statusText = 'Đang chờ duyệt ⏳';
+                rejectionReason = '-';
+              }
+
+              tr.innerHTML = `
+                <td>${skin.title}</td>
+                <td>${new Date(skin.createdAt).toLocaleDateString()}</td>
+                <td>${statusText}</td>
+                <td>${rejectionReason}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Lỗi khi lấy skins:', error);
+          // Hiển thị thông báo lỗi cho người dùng
+          const tbody = document.getElementById('skins-table-body');
+          tbody.innerHTML = ''; // Xóa danh sách cũ
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td colspan="4" style="color: red;">Lỗi: ${error.message}</td>`;
+          tbody.appendChild(tr);
+        });
+    }
+
+    // Gọi lại danh sách skin khi trang được tải
+    document.addEventListener('DOMContentLoaded', getMySkins);
+  </script>
+</body>
+</html>

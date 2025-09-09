@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Skin Mod</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countUp.umd.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .fixed-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+    body { padding-top: 40px; }
+
+    
+    
+  </style>
+  
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <div class="fixed-nav w-full"> 
+  <div class="bg-white shadow-md container mx-auto px-4 rounded-lg"> <!-- Thêm rounded-lg vào đây -->
+    <nav class="py-2 flex justify-between items-center rounded-lg"> <!-- Thêm rounded-lg vào đây -->
+      <a href="/">
+        <img src="/images/9.png" alt="Skin Mods VN Logo" class="h-8">
+      </a>
+      
+      <div class="flex items-center space-x-4">
+        <button id="search-btn" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+          <i class="fas fa-search"></i>
+        </button>
+        <div id="auth-section" class="relative">
+          <a id="login-btn" href="/auth/google"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+            Đăng nhập với Google
+          </a>
+        
+          <div id="user-menu-container" class="hidden">
+            <button id="user-menu-btn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+              <img id="user-avatar" src="/images/11.png" alt="avatar" class="w-8 h-8 rounded-full border border-gray-300">
+              <i class="fas fa-caret-down text-sm"></i>
+            </button>
+            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
+              <div class="block px-4 py-2 text-sm font-semibold text-gray-800" id="user-name-display"></div>
+              <div class="border-t border-gray-200 my-1"></div>
+              
+              <a id="upload-btn" href="/upload.html" class="hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                <i class="fas fa-upload mr-2"></i> Upload Skin
+              </a>
+              <a id="upload-status-btn" href="/my-skins" class="hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                <i class="fas fa-list-alt mr-2"></i> Trạng thái Upload
+              </a>
+              <a id="admin-btn" href="/admin" class="hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                <i class="fas fa-tools mr-2"></i> Quản lý Admin
+              </a>
+              <a id="logout-btn" href="#" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-100 transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<!-- Phần phân loại vẫn giữ nguyên -->
+<div class="container mx-auto mt-4 mb-4 px-4">
+  <div class="bg-white rounded-lg shadow-md py-3 flex justify-center space-x-4">
+    <button class="filter-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition" data-game="truckers-of-europe-3">
+      Truckers of Europe 3
+    </button>
+    <button class="filter-btn px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition" data-game="bus-simulator-indonesia">
+      Bus Simulator Indonesia
+    </button>
+    <button class="filter-btn px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition" data-game="world-truck-driving-simulator">
+      World Truck Driving Simulator
+    </button>
+    <button class="filter-btn px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition" data-game="khac">
+      Khác
+    </button>
+  </div>
+</div>
+
+
+  <!-- Search Overlay -->
+  <div id="search-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-24">
+    <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6">
+      <div class="flex items-center space-x-3 mb-4">
+        <i class="fas fa-search text-gray-500"></i>
+        <input type="text" id="search-input" placeholder="Tìm kiếm skin..."
+          class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button id="close-search" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+      </div>
+      <div>
+        <label for="filter-select" class="block text-sm text-gray-600 mb-2">Phân loại</label>
+        <select id="filter-select"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">-- Tất cả --</option>
+          <option value="xe_khach">Xe khách</option>
+          <option value="xe_tai">Xe tải</option>
+          <option value="khac">Khác</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="container mx-auto p-6">
+    <h2 class="text-3xl font-bold text-gray-700 mb-6">Mới cập nhật</h2>
+    <div id="skins-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+  </main>
+
+  <!-- STATS -->
+  <div id="stats-container" class="container mx-auto p-6 mt-8">
+    <div class="bg-white p-6 rounded-lg shadow-md flex flex-wrap justify-around items-center text-center space-y-4 md:space-y-0">
+      <div class="w-1/2 md:w-auto flex flex-col items-center">
+        <i class="fas fa-truck-monster text-blue-500 text-3xl mb-2"></i>
+        <div class="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent" id="total-skins">0</div>
+        <div class="text-gray-500 mt-1">Tổng số Skin</div>
+      </div>
+      <div class="w-1/2 md:w-auto flex flex-col items-center">
+        <i class="fas fa-users text-green-500 text-3xl mb-2"></i>
+        <div class="text-3xl font-bold bg-gradient-to-r from-green-500 to-lime-400 bg-clip-text text-transparent" id="total-users">0</div>
+        <div class="text-gray-500 mt-1">Tổng số Tài khoản</div>
+      </div>
+      <div class="w-1/2 md:w-auto flex flex-col items-center">
+        <i class="fas fa-eye text-indigo-500 text-3xl mb-2"></i>
+        <div class="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-blue-400 bg-clip-text text-transparent" id="total-visits">0</div>
+        <div class="text-gray-500 mt-1">Lượt truy cập</div>
+      </div>
+      <div class="w-1/2 md:w-auto flex flex-col items-center">
+        <i class="fas fa-plus-circle text-purple-500 text-3xl mb-2"></i>
+        <div class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent" id="new-skins-today">0</div>
+        <div class="text-gray-500 mt-1">Skin mới hôm nay</div>
+      </div>
+      <div class="w-1/2 md:w-auto flex flex-col items-center">
+        <i class="fas fa-download text-red-500 text-3xl mb-2"></i>
+        <div class="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-400 bg-clip-text text-transparent" id="total-downloads">0</div>
+        <div class="text-gray-500 mt-1">Tổng lượt tải về</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-gray-800 text-white p-4 text-center mt-8">
+    <p>&copy; 2025 Skin Mods VN. Tất cả bản quyền thuộc về tác giả.</p>
+  </footer>
+
+  
+  <!-- SCRIPT -->
+  <script>
+    
+    // Các biến cần thiết, không bị trùng lặp
+    const loginBtn = document.getElementById('login-btn');
+    const authSection = document.getElementById('auth-section');
+    const userMenuContainer = document.getElementById('user-menu-container');
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const userDropdownMenu = document.getElementById('user-dropdown-menu');
+    const userNameDisplay = document.getElementById('user-name-display');
+    const uploadBtn = document.getElementById('upload-btn');
+    const adminBtn = document.getElementById('admin-btn');
+    const uploadStatusBtn = document.getElementById('upload-status-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const searchBtn = document.getElementById('search-btn');
+    const searchOverlay = document.getElementById('search-overlay');
+    const closeSearch = document.getElementById('close-search');
+    const searchInput = document.getElementById('search-input');
+    const filterSelect = document.getElementById('filter-select');
+    const skinsContainer = document.getElementById('skins-container');
+    const gameFilterBtns = document.querySelectorAll('.filter-btn');
+
+    let allSkins = [];
+
+    // Toggle menu dropdown
+    if (userMenuBtn) {
+        userMenuBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            userDropdownMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Ẩn menu khi nhấp ra ngoài
+    window.addEventListener('click', (event) => {
+        if (userMenuContainer && !userMenuContainer.contains(event.target)) {
+            userDropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Hàm kiểm tra đăng nhập đã được gộp lại
+    async function checkLogin() {
+        try {
+            const res = await fetch('/api/me');
+            const data = await res.json();
+
+            if (data.isLoggedIn) {
+                // Đã đăng nhập
+                loginBtn.classList.add('hidden');
+                userMenuContainer.classList.remove('hidden');
+                userNameDisplay.textContent = data.displayName;
+
+                // Ẩn tất cả các nút ban đầu
+                uploadBtn.classList.add('hidden');
+                adminBtn.classList.add('hidden');
+                uploadStatusBtn.classList.add('hidden');
+
+                // Nếu là user
+                if (data.role === 'user') {
+                    uploadBtn.classList.remove('hidden');
+                    fetch('/api/user-has-skins')
+                        .then(res => res.json())
+                        .then(info => {
+                            if (info.hasSkins) {
+                                uploadStatusBtn.classList.remove('hidden');
+                            }
+                        });
+                }
+                // Nếu là admin
+                if (data.role === 'admin') {
+                    uploadBtn.classList.remove('hidden');
+                    adminBtn.classList.remove('hidden');
+                }
+            } else {
+                // Chưa đăng nhập
+                loginBtn.classList.remove('hidden');
+                userMenuContainer.classList.add('hidden');
+                uploadBtn.classList.add('hidden');
+                adminBtn.classList.add('hidden');
+                uploadStatusBtn.classList.add('hidden');
+            }
+        } catch (err) {
+            console.error("Lỗi checkLogin:", err);
+        }
+    }
+
+    // Xử lý sự kiện đăng xuất
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await fetch('/logout');
+            location.reload();
+        });
+    }
+
+    // Các hàm khác giữ nguyên
+    function renderSkins(skins) {
+        skinsContainer.innerHTML = '';
+        skins.forEach(skin => {
+            const skinCard = `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out">
+                    <a href="/skin/${skin._id}">
+                        <img src="${skin.demoImageUrl}" alt="${skin.title}" class="w-full h-48 object-cover">
+                    </a>
+                    <div class="p-4 space-y-2">
+                        <h3 class="text-lg font-semibold text-gray-800 truncate">${skin.title}</h3>
+                        <p class="text-sm text-gray-500 flex items-center">
+                            <i class="fas fa-user mr-2 text-yellow-500"></i>${skin.author}
+                        </p>
+                        <p class="text-sm text-gray-500 flex items-center">
+                            <i class="fas fa-gamepad mr-2 text-blue-500"></i>${skin.game || 'Không rõ'}
+                        </p>
+                        <p class="text-sm text-gray-500 flex items-center">
+                            <i class="fas fa-tags mr-2 text-green-500"></i>${skin.type}
+                        </p>
+                        <div class="flex items-center justify-between mt-3">
+                            <button class="like-btn flex items-center space-x-2 text-sm px-3 py-1 rounded-full bg-gray-100 hover:bg-red-100 transition"
+                                    data-skin-id="${skin._id}"
+                                    data-liked="${skin.isLikedByUser}">
+                                <i class="fas fa-heart ${skin.isLikedByUser ? 'text-red-500' : 'text-gray-400'}"></i>
+                                <span class="like-count">${skin.likes || 0}</span>
+                            </button>
+                            <a href="/skin/${skin._id}" class="text-blue-500 hover:underline text-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            skinsContainer.innerHTML += skinCard;
+        });
+    }
+
+    function filterSkins() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterType = filterSelect.value;
+        const filteredSkins = allSkins.filter(skin => {
+            const matchesSearch = skin.title.toLowerCase().includes(searchTerm) || skin.author.toLowerCase().includes(searchTerm);
+            const matchesFilter = filterType === '' || skin.type === filterType;
+            return matchesSearch && matchesFilter;
+        });
+        renderSkins(filteredSkins);
+    }
+
+    gameFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const game = btn.dataset.game;
+            const filtered = game === "khac"
+                ? allSkins.filter(skin => !["truckers-of-europe-3", "bus-simulator-indonesia", "world-truck-driving-simulator"].includes(skin.game || "khac"))
+                : allSkins.filter(skin => (skin.game || "khac") === game);
+            if (filtered.length > 0) {
+                renderSkins(filtered);
+            } else {
+                skinsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-gray-500">
+                        Chưa có skin cho game này.
+                    </div>
+                `;
+            }
+        });
+    });
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            searchOverlay.classList.remove('hidden');
+            searchInput.focus();
+        });
+    }
+    if (closeSearch) {
+        closeSearch.addEventListener('click', () => searchOverlay.classList.add('hidden'));
+    }
+    if (searchOverlay) {
+        searchOverlay.addEventListener('click', (e) => {
+            if (e.target === searchOverlay) searchOverlay.classList.add('hidden');
+        });
+    }
+
+    async function fetchSkins() {
+        try {
+            const response = await fetch('/api/skins');
+            allSkins = await response.json();
+            renderSkins(allSkins);
+            bindLikeEvents();
+        } catch (error) {
+            console.error('Lỗi khi tải skin:', error);
+        }
+    }
+
+    async function fetchStats() {
+        try {
+            const response = await fetch('/api/stats');
+            const stats = await response.json();
+            const options = { duration: 2.5 };
+            const animateCountUp = (elementId, endVal) => {
+                const element = document.getElementById(elementId);
+                const countUp = new window.countUp.CountUp(element, endVal, options);
+                if (!countUp.error) countUp.start();
+                else element.textContent = endVal;
+            };
+            animateCountUp('total-skins', stats.totalSkins);
+            animateCountUp('total-users', stats.totalUsers);
+            animateCountUp('new-skins-today', stats.newSkinsToday);
+            animateCountUp('total-downloads', stats.totalDownloads);
+            animateCountUp('total-visits', stats.totalVisits);
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu thống kê:', error);
+        }
+    }
+
+    function bindLikeEvents() {
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const skinId = button.getAttribute('data-skin-id');
+                const isLiked = button.getAttribute('data-liked') === 'true';
+                const icon = button.querySelector('i');
+                const countSpan = button.querySelector('.like-count');
+                const currentLikes = parseInt(countSpan.textContent, 10) || 0;
+                const newLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
+                button.setAttribute('data-liked', (!isLiked).toString());
+                icon.classList.toggle('text-red-500', !isLiked);
+                icon.classList.toggle('text-gray-400', isLiked);
+                countSpan.textContent = newLikes;
+
+                try {
+                    const res = await fetch(`/api/skins/${skinId}/like`, {
+                        method: 'POST'
+                    });
+                    if (!res.ok) {
+                        const msg = await res.text();
+                        alert(msg || "Bạn cần đăng nhập để thả tim.");
+                        button.setAttribute('data-liked', isLiked.toString());
+                        icon.classList.toggle('text-red-500', isLiked);
+                        icon.classList.toggle('text-gray-400', !isLiked);
+                        countSpan.textContent = currentLikes;
+                        return;
+                    }
+                    const updatedData = await res.json();
+                    const index = allSkins.findIndex(s => s._id === skinId);
+                    if (index !== -1) {
+                        allSkins[index].isLikedByUser = updatedData.isLikedByUser;
+                        allSkins[index].likes = updatedData.likes;
+                    }
+                } catch (err) {
+                    console.error("Lỗi khi thả tim:", err);
+                    button.setAttribute('data-liked', isLiked.toString());
+                    icon.classList.toggle('text-red-500', isLiked);
+                    icon.classList.toggle('text-gray-400', !isLiked);
+                    countSpan.textContent = currentLikes;
+                }
+            });
+        });
+    }
+
+    // Lắng nghe sự kiện tải trang
+    document.addEventListener('DOMContentLoaded', () => {
+        checkLogin();
+        fetchSkins();
+        fetchStats();
+    });
+
+    window.addEventListener('focus', () => {
+        fetchSkins();
+    });
+
+    
+</script>
+</body>
+</html>

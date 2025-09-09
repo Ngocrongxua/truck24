@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title id="page-title">Chi tiết Skin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+  <style>
+    .fixed-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+    body {
+      padding-top: 72px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-white p-4 shadow-md flex justify-between items-center fixed-nav">
+    <div class="flex items-center">
+      <a href="/">
+        <img src="/images/9.png" alt="Skin Mods VN Logo" class="h-10" />
+      </a>
+    </div>
+    <div class="space-x-4">
+      <a href="/" class="text-gray-600 hover:text-gray-800 transition duration-300">Trang chủ</a>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="container mx-auto p-6">
+    <div id="skin-detail-container" class="bg-white p-8 rounded-lg shadow-lg"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white p-4 text-center mt-8">
+    <p>&copy; 2025 Skin Mods VN. Tất cả bản quyền thuộc về tác giả.</p>
+    <p class="text-sm mt-2">
+      Nội dung skin mod được đóng góp bởi cộng đồng. Vui lòng tôn trọng quyền sở
+      hữu của các tác giả. Mọi hành vi sao chép, chỉnh sửa hoặc kinh doanh trái
+      phép đều bị nghiêm cấm. Xin cảm ơn!
+    </p>
+  </footer>
+
+  <!-- SwiperJS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+
+  <script>
+    const skinDetailContainer = document.getElementById("skin-detail-container");
+    const pageTitle = document.getElementById("page-title");
+
+    function getSkinIdFromUrl() {
+      const path = window.location.pathname;
+      const parts = path.split("/");
+      return parts[parts.length - 1];
+    }
+
+    async function fetchSkinDetails(skinId) {
+      try {
+        const response = await fetch(`/api/skins/${skinId}`);
+        if (!response.ok) throw new Error("Không tìm thấy skin.");
+        const skin = await response.json();
+        renderSkinDetails(skin);
+      } catch (error) {
+        console.error("Lỗi khi tải chi tiết skin:", error);
+        skinDetailContainer.innerHTML = `<p class="text-red-500">${error.message}</p>`;
+      }
+    }
+
+    function renderSkinDetails(skin) {
+      pageTitle.textContent = skin.title;
+
+      const inGameImagesHtml = (skin.inGameImageUrls || [])
+        .map(
+          (url) => `
+          <div class="swiper-slide">
+            <img src="${url}" alt="Ảnh trong game" 
+                 class="w-full rounded-xl shadow-md hover:scale-105 transform transition duration-300"/>
+          </div>`
+        )
+        .join("");
+
+      const detailHtml = `
+        <div class="text-center mb-8">
+          <h1 class="text-4xl font-extrabold text-gray-900 mb-2">${skin.title}</h1>
+          <span class="inline-block bg-blue-100 text-blue-700 text-sm font-medium px-3 py-1 rounded-full">
+            ✍️ Tác giả: ${skin.author}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Ảnh Demo</h2>
+            <img src="${skin.demoImageUrl}" alt="Ảnh demo" 
+                 class="w-full rounded-xl shadow-md hover:scale-105 transform transition duration-300"/>
+          </div>
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Ảnh trong Game</h2>
+            <div class="swiper mySwiper rounded-xl shadow-md">
+              <div class="swiper-wrapper">
+                ${inGameImagesHtml}
+              </div>
+              <div class="swiper-pagination"></div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center border-t border-gray-200 pt-8">
+          <h2 class="text-2xl font-semibold text-gray-700 mb-4">📜 Bản quyền & Nội dung</h2>
+          <p class="text-gray-600 leading-relaxed max-w-2xl mx-auto mb-6">
+            Nội dung skin mod được đóng góp bởi cộng đồng. 
+            Vui lòng tôn trọng quyền sở hữu trí tuệ của tác giả và chỉ sử dụng cho mục đích cá nhân, phi thương mại. 
+            Mọi hành vi sao chép, chỉnh sửa hoặc kinh doanh trái phép đều bị nghiêm cấm. Xin cảm ơn!
+          </p>
+
+          <a id="download-btn" data-file-url="${skin.skinFileUrl}" href="#"
+             class="inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white 
+                    text-lg font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl 
+                    transform hover:scale-105 transition duration-300">
+            ⬇️ Tải Xuống File Skin
+          </a>
+        </div>
+      `;
+      skinDetailContainer.innerHTML = detailHtml;
+
+      new Swiper(".mySwiper", {
+        loop: true,
+        pagination: { el: ".swiper-pagination", clickable: true },
+        navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+      });
+
+      const downloadBtn = document.getElementById("download-btn");
+      downloadBtn.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const skinId = getSkinIdFromUrl();
+        const fileUrl = downloadBtn.getAttribute("data-file-url");
+        try {
+          await fetch(`/api/skins/${skinId}/download`, { method: "POST" });
+        } catch (error) {
+          console.error("Lỗi khi đếm lượt tải:", error);
+        }
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        const fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const skinId = getSkinIdFromUrl();
+      if (skinId) {
+        fetchSkinDetails(skinId);
+      } else {
+        skinDetailContainer.innerHTML = `<p class="text-red-500">Không tìm thấy ID skin.</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

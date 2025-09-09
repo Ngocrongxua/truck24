@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Skin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Check đăng nhập trước khi cho upload
+    async function checkLogin() {
+      const res = await fetch('/api/me');
+      const data = await res.json();
+      if (!data.isLoggedIn) {
+        alert('Bạn cần đăng nhập trước khi upload skin!');
+        window.location.href = '/'; // quay về trang chính
+      } else {
+        document.getElementById('username').textContent = data.displayName;
+      }
+    }
+
+    // Hiện dung lượng file đã chọn
+    function showFileSize(input, labelId) {
+      const file = input.files[0];
+      if (file) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        document.getElementById(labelId).textContent = `Đã chọn: ${file.name} (${sizeMB} MB)`;
+
+        // Giới hạn 20MB
+        if (file.size > 20 * 1024 * 1024) {
+          alert("File vượt quá 20MB!");
+          input.value = ""; // reset input
+          document.getElementById(labelId).textContent = "";
+        }
+      } else {
+        document.getElementById(labelId).textContent = "";
+      }
+    }
+
+    window.onload = checkLogin;
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
+    <h2 class="text-2xl font-bold mb-4">Upload Skin</h2>
+    <p class="mb-4 text-gray-600">Xin chào <span id="username" class="font-semibold">...</span> 👋</p>
+
+    <form id="uploadForm" enctype="multipart/form-data" class="space-y-4">
+  <!-- Tên skin -->
+  <div>
+    <label class="block mb-1 font-medium">Tên Skin</label>
+    <input type="text" name="skinTitle" required class="w-full p-2 border rounded">
+  </div>
+
+  <!-- Game -->
+  <div>
+    <label class="block mb-1 font-medium">Chọn Game</label>
+    <select name="skinGame" required class="w-full p-2 border rounded">
+      <option value="">-- Chọn Game --</option>
+      <option value="truckers-of-europe-3">Truckers of Europe 3</option>
+      <option value="bus-simulator-indonesia">Bus Simulator Indonesia</option>
+      <option value="world-truck-driving-simulator">World Truck Driving Simulator</option>
+      <option value="other">Khác</option>
+    </select>
+  </div>
+
+  <!-- Loại xe -->
+  <div>
+    <label class="block mb-1 font-medium">Loại</label>
+    <select name="skinType" required class="w-full p-2 border rounded">
+      <option value="xe_khach">Xe khách</option>
+      <option value="xe_tai">Xe tải</option>
+      <option value="phu_kien">Phụ kiện</option>
+      <option value="khac">Khác</option>
+    </select>
+  </div>
+
+  <!-- Ảnh demo -->
+  <div>
+    <label class="block mb-1 font-medium">Ảnh demo (1 ảnh)</label>
+    <input type="file" name="demoImage" accept="image/*" required>
+  </div>
+
+  <!-- Ảnh trong game -->
+  <div>
+    <label class="block mb-1 font-medium">Ảnh trong game (tối đa 2)</label>
+    <input type="file" name="inGameImages" accept="image/*" multiple>
+  </div>
+
+  <!-- File skin -->
+  <div>
+    <label class="block mb-1 font-medium">File Skin (.zip, .rar, .7z, .scs, hoặc ảnh)</label>
+    <input type="file" name="skinFile" 
+           accept=".zip,.rar,.7z,.scs,image/*" 
+           required 
+           onchange="showFileSize(this, 'skinFileInfo')">
+    <p id="skinFileInfo" class="text-sm text-gray-600 mt-1"></p>
+  </div>
+
+  <!-- Mô tả -->
+  <div>
+    <label class="block mb-1 font-medium">Mô tả (tùy chọn)</label>
+    <textarea name="description" rows="4" class="w-full p-2 border rounded"></textarea>
+  </div>
+
+  <!-- Nút submit -->
+  <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+    🚀 Tải lên Skin
+  </button>
+</form>
+
+<!-- ✅ Thông báo thành công -->
+<div id="uploadMessage" class="hidden text-green-600 mt-4 text-center font-semibold">
+  🎉 Upload thành công! Đang chờ admin duyệt...
+</div>
+
+<!-- ✅ Script xử lý upload -->
+<script>
+  document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch('/upload-skin', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const msg = document.getElementById('uploadMessage');
+        msg.classList.remove('hidden');
+
+        // 3 giây sau chuyển về trang chủ
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 3000);
+      } else {
+        const text = await res.text();
+        alert("❌ Upload thất bại: " + text);
+      }
+    } catch (err) {
+      alert("❌ Lỗi khi upload: " + err.message);
+    }
+  });
+</script>
+
+  </div>
+</body>
+</html>
