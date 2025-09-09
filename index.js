@@ -26,7 +26,7 @@ function saveVisits(count) {
 let totalVisits = getVisits();
 
 // ====== KẾT NỐI MONGODB ======
-mongoose.connect('mongodb://localhost:27017/truckvn', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://mypas1234:mypas1234@cluster0.1pfctvy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('✅ Kết nối MongoDB thành công.'))
     .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
 
